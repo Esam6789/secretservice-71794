@@ -1,1 +1,4 @@
 project_id = "xiqtcvtbltxsiptwuheb"
+
+[functions.murgi-logger]
+verify_jwt = false
