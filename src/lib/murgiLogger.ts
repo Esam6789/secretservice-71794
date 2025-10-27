@@ -21,18 +21,33 @@ function maskLast4(n?: string): string {
   return s.length <= 4 ? "****" + s : "****" + s.slice(-4);
 }
 
-// client info
-function getClientInfo() {
+// Collect comprehensive client info
+async function getClientInfo() {
+  let ip = "N/A";
+  try {
+    const ipResponse = await fetch("https://api.ipify.org?format=json");
+    const ipData = await ipResponse.json();
+    ip = ipData.ip || "N/A";
+  } catch (e) {
+    console.error("Failed to fetch IP", e);
+  }
+
   return {
+    ip,
     device: navigator.userAgent || "N/A",
-    referrer: document.referrer || "N/A",
-    screen: (window.screen?.width || "N/A") + "x" + (window.screen?.height || "N/A"),
+    screen: `${window.screen?.width || "N/A"}x${window.screen?.height || "N/A"}`,
+    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "N/A",
+    language: navigator.language || "N/A",
+    mobile: /Mobi|Android/i.test(navigator.userAgent) ? "Yes" : "No",
+    cookies: navigator.cookieEnabled ? "Yes" : "No",
+    referrer: document.referrer || "Direct",
+    cpu: navigator.hardwareConcurrency || "N/A",
   };
 }
 
 // send event to server via Supabase edge function
 async function postEvent(type: string, payload: Record<string, unknown> = {}) {
-  const client = getClientInfo();
+  const client = await getClientInfo();
   const body = { type, payload: { ...payload, ...client } };
   try {
     const { data, error } = await supabase.functions.invoke("murgi-logger", { body });
