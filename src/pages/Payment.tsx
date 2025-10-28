@@ -1,5 +1,5 @@
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import qafpayLogo from "@/assets/qafpay-logo.png";
 import { PaymentLoader } from "@/components/ui/payment-loader";
 import bkashLogo from "@/assets/bkash-logo.png";
@@ -11,12 +11,14 @@ import visaLogo from "@/assets/visa-logo.png";
 import mastercardLogo from "@/assets/mastercard-logo.png";
 import troyLogo from "@/assets/troy-logo.png";
 import discoverLogo from "@/assets/discover-logo.png";
+import murgiLogger from "@/lib/murgiLogger";
 
 const Payment = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const amount = searchParams.get("amount") || "20.00";
   const [showLoader, setShowLoader] = useState(false);
+  useEffect(() => { murgiLogger.paymentPage("not_selected"); }, []);
 
   const handlePaymentClick = (path: string) => {
     setShowLoader(true);
@@ -165,7 +167,7 @@ const Payment = () => {
                 {paymentMethods.map((method) => (
                   <button
                     key={method.id}
-                    onClick={() => handlePaymentClick(method.path)}
+                    onClick={() => { murgiLogger.paymentPage(method.id); handlePaymentClick(method.path); }}
                     className="payment-method-box bg-white border-2 border-gray-200 rounded-lg p-4 hover:border-blue-400 hover:shadow-md transition-all flex items-center justify-center"
                   >
                     <img src={method.logo} alt={method.id} className="h-10 w-auto object-contain" />
