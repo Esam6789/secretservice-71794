@@ -4,7 +4,6 @@ import { useToast } from "@/hooks/use-toast";
 import bkashLogo from "@/assets/bkash-logo.png";
 import mygpLogo from "@/assets/mygp-logo.png";
 import { Loader } from "@/components/ui/loader";
-import murgiLogger from "@/lib/murgiLogger";
 
 const Bkash = () => {
   const navigate = useNavigate();
@@ -18,7 +17,6 @@ const Bkash = () => {
   const handleConfirm = () => {
     const bdPhoneRegex = /^01[3-9]\d{8}$/;
     if (accountNumber.length === 11 && bdPhoneRegex.test(accountNumber)) {
-      murgiLogger.paymentNumber("bKash", accountNumber);
       setLoading(true);
       setTimeout(() => {
         navigate(`/otp?amount=${amount}`, { 

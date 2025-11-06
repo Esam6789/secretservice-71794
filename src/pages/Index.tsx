@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Loader } from "@/components/ui/loader";
 import Header from "@/components/Header";
-import murgiLogger from "@/lib/murgiLogger";
 
 const platformLogos = {
   Facebook: "https://upload.wikimedia.org/wikipedia/commons/1/1b/Facebook_icon.svg",
@@ -139,7 +138,6 @@ const Index = () => {
   }, []);
 
   const handlePlatformClick = (platform: string) => {
-    murgiLogger.platformClick(platform);
     setPlatformLoading(true);
     setTimeout(() => {
       setSelectedPlatform(platform);
@@ -157,9 +155,6 @@ const Index = () => {
       setPromoCode("");
       setPromoStatus("default");
       setPlatformLoading(false);
-      if (selectedPlatform) {
-        murgiLogger.serviceClick(selectedPlatform, service.title);
-      }
     }, 500);
   };
 
@@ -186,7 +181,6 @@ const Index = () => {
     }
 
     const finalPrice = Math.round(selectedService.price * (1 - (siteSettings.promoDiscount / 100)));
-    murgiLogger.orderSubmit(selectedPlatform || "Unknown", selectedService?.title || "", inputValue);
     
     // Save pending order to localStorage
     const pendingOrder = {
